@@ -1,0 +1,27 @@
+FROM python:3.9-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir jupyter tensorflow keras flask
+
+# Install MySQL connector
+RUN pip install mysql-connector-python
+
+# Set up Jupyter config
+RUN jupyter notebook --generate-config
+RUN echo "c.NotebookApp.ip = '0.0.0.0'" >> /root/.jupyter/jupyter_notebook_config.py
+RUN echo "c.NotebookApp.allow_root = True" >> /root/.jupyter/jupyter_notebook_config.py
+RUN echo "c.NotebookApp.open_browser = False" >> /root/.jupyter/jupyter_notebook_config.py
+
+# Set the working directory
+WORKDIR /app
+
+# Expose the Jupyter and Flask ports
+EXPOSE 8888 5000
+
+# Start Jupyter Notebook and Flask app
+CMD ["sh", "-c", "jupyter notebook --allow-root --ip=0.0.0.0 --port=8888 --no-browser"]

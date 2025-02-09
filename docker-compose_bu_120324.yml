@@ -1,0 +1,110 @@
+services:
+    cfoam-php:
+        build:
+            context: .
+            dockerfile: Dockerfile.laravel
+        image: cfoam-php
+        container_name: cfoam-php
+        restart: unless-stopped
+        working_dir: /var/www/cfoam
+        volumes:
+            - ./src:/var/www/cfoam
+            - ./src/.env:/var/www/cfoam/.env
+        environment:
+            - APP_ENV=local
+        networks:
+            - cfoam-network
+        depends_on:
+            - cfoam-mysql
+
+    cfoam-nginx:
+        image: nginx:alpine
+        container_name: cfoam-nginx
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www/cfoam
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+        depends_on:
+            - cfoam-php
+        networks:
+            - cfoam-network
+            
+    cfoam-node:
+        platform: linux/arm64/v8 #this line is optional if you are using Mac Silicon chip (M1/M2/M3)
+        build:
+            context: .
+            dockerfile: Dockerfile.node
+        image: cfoam-node
+        container_name: cfoam-node
+        ports:
+            - "3000:3000"
+        restart: unless-stopped
+        working_dir: /var/www/cfoam/vue
+        volumes:
+            - ./src/vue:/var/www/cfoam/vue
+            - ./src/vue/vite.config.ts:/var/www/cfoam/vue/vite.config.ts
+            - ./src/vue/src:/var/www/cfoam/vue/src
+            - ./src/vue/public:/var/www/cfoam/vue/public
+            - ./src/.env:/var/www/cfoam/.env
+            - /var/www/cfoam/vue/node_modules
+        command: npm run dev
+        networks:
+            - cfoam-network
+
+    cfoam-python:
+        build:
+            context: .
+            dockerfile: Dockerfile.python
+        container_name: cfoam-python
+        volumes:
+            - ./src/python:/app
+        ports:
+            - "5000:5000"
+        depends_on:
+            - cfoam-mysql
+        networks:
+            - cfoam-network
+
+    cfoam-jupyter:
+        build:
+            context: .
+            dockerfile: Dockerfile.jupyter
+        container_name: cfoam-jupyter
+        volumes:
+            - ./src:/app
+        ports:
+            - "8888:8888"
+        environment:
+            - JUPYTER_TOKEN=myToken223  # Replace with a secure token
+        depends_on:
+            - cfoam-php
+            - cfoam-mysql
+        networks:
+            - cfoam-network
+
+    cfoam-mysql:
+        build:
+            context: .
+            dockerfile: Dockerfile.mysql
+        image: cfoam-mysql
+        container_name: cfoam-mysql
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+            MYSQL_DATABASE: cfoam
+            MYSQL_USER: cfoam
+            MYSQL_PASSWORD: password
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3307:3306"
+        networks:
+            - cfoam-network
+
+networks:
+    cfoam-network:
+        driver: bridge
+
+volumes:
+    mysql_data:

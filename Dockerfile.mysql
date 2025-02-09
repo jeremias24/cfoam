@@ -1,0 +1,9 @@
+FROM mysql:8
+
+# Add any custom configurations if needed
+COPY ./mysql/my.cnf /etc/mysql/conf.d/my.cnf
+
+# You can add initialization scripts if required
+# COPY ./mysql/init.sql /docker-entrypoint-initdb.d/
+
+CMD ["mysqld"]

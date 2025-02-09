@@ -1,0 +1,13 @@
+tensorflow==2.10.0  # TensorFlow for Machine Learning
+keras      # Keras as part of TensorFlow
+numpy<2.0           # TensorFlow depends on NumPy below 2.0
+flask               # Web framework for APIs
+Flask-SQLAlchemy    # ORM integration for Flask
+Werkzeug==2.0.1     # Version compatible with Flask
+protobuf>=3.9.2,<3.20  # Required by TensorFlow
+SQLAlchemy==1.4.23  # ORM library (Flask-SQLAlchemy depends on this)
+pymysql==1.0.2      # MySQL database adapter for Python
+scikit-learn==0.24.2  # Machine learning utilities
+opencv-python       # OpenCV for image processing
+cryptography        # Required for security features (only keep if needed)
+flask-cors

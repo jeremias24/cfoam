@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Paint Analysis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #4caf50, #81c784);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            margin: 0;
+        }
+
+        #chat-container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        #chat-header {
+            background: linear-gradient(to right, #43a047, #66bb6a);
+            padding: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #chat-box {
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: center;
+        }
+
+        form {
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            transition: box-shadow 0.3s ease;
+            width: 100%;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 1rem;
+            color: white;
+            background: linear-gradient(to right, #43a047, #66bb6a);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.3s ease;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        button:hover {
+            background: #43a047;
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #chat-container {
+                margin: 0 20px;
+            }
+
+            button {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="chat-header">
+            <h1>Upload an Image for Processing</h1>
+        </div>
+        <div id="chat-box">
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>
