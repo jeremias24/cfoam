@@ -79,8 +79,15 @@ export default defineComponent({
     const initButtonIcon = ref(props.buttonIcon);
     const initFilesizeAccepted = ref(props.filesizeAccepted);
 
-    const initFiles = ref([]);
+    const initFiles = ref(props.formData);
     const initFile = ref(null);
+
+    watch(
+      () => props.formData,
+      (value) => {
+        initFiles.value = value.images;
+      }
+    );
 
     const uploadFiles = (event: Event) => {
 
@@ -160,79 +167,6 @@ export default defineComponent({
         });
     };
 
-
-    /* const uploadFiles = (event: Event) => {
-        const files = Array.from((event.target as HTMLInputElement).files || []);
-        
-        files.forEach((file) => {
-            if (
-                props.fileExtensionAccepted === "any" || 
-                props.fileExtensionAccepted === file.name.substr(file.name.lastIndexOf(".") + 1) || 
-                props.fileExtensionAccepted.includes(file.name.substr(file.name.lastIndexOf(".") + 1))
-            ) {
-                
-                if (props.maxFilesAccepted === "infinity" || parseInt(props.maxFilesAccepted) >= initFiles.value.length) {
-                    if (parseInt(initFilesizeAccepted.value) * 1048576 >= file.size) {
-                        if (
-                            props.maxFilesize === "infinity" || 
-                            parseInt(props.maxFilesize) * 1048576 >= 
-                            MixinService.calculateSum(initFiles.value, "filesize") + file.size
-                        ) {
-                            let process = true;
-
-                            if (
-                                props.checkDuplicateFile && 
-                                initFiles.value.some(
-                                    (value) => 
-                                        value.filename === file.name &&
-                                        value.filesize === file.size &&
-                                        value.lastModified === file.lastModified
-                                )
-                            ) {
-                                process = false;
-                            }
-
-                            if (process) {
-
-                                const reader = new FileReader();
-                                reader.onload = () => {
-                                    initFiles.value.push({
-                                        file,
-                                        file: file,
-                                        filename: file.name,
-                                        filetype: file.name.substr(file.name.lastIndexOf(".") + 1),
-                                        filesize: file.size,
-                                        preview: reader.result, // Preview URL
-                                        filepath: props.containerPath,
-                                        mimeType: file.type,
-                                        lastModified: file.lastModified,
-                                        sourceType: "upload",
-                                    });
-
-                                }
-
-                                emit("update:formData", { [props.formKey]: initFiles.value });
-
-                                reader.readAsDataURL(file);
-                            } else {
-                                MixinService.showAlert(`File ${file.name} already exists.`);
-                            }
-                        } else {
-                            MixinService.showAlert(`Reached accumulated maximum ${props.maxFilesize}MB for all files.`);
-                        }
-                    } else {
-                        MixinService.showAlert(`Maximum of ${initFilesizeAccepted.value}MB per file only.`);
-                    }
-                } else {
-                    MixinService.showAlert(`Maximum of ${props.maxFilesAccepted} files accepted.`);
-                }
-            } else {
-                MixinService.showAlert(`${props.fileExtensionAccepted} file extension is accepted.`);
-            }
-        });
-    }; */
-
-
     const uploadFile = (event) => {
         initFile.value = event.target.files[0];
 
@@ -286,13 +220,11 @@ export default defineComponent({
         return MixinService.covertFilesize(value);
     };
 
-
     const openViewer = (index: number) => {
       currentImageIndex.value = index;
       viewerVisible.value = true;
     };
 
-    
     return {
       initFiles,
       uploadFiles,

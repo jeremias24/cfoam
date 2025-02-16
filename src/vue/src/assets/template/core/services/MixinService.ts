@@ -172,6 +172,17 @@ export const validateForm = (data: object, rules: any): any => {
                     return false;
                 }
 
+
+                if (item?.type === 'images' && (!value || Object.keys(value).length == 0 || value?.images?.length == 0)) {
+                    validation.value = {
+                        valid: false,
+                        id: key,
+                        error: item?.message,
+                        type: "images",
+                    };
+                    return false;
+                }
+
                 return true;
             });
         }

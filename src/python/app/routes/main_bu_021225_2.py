@@ -89,7 +89,6 @@ def train_model():
 
     return model
 
-
 def load_or_train_model():
     """Load trained model or train a new one if missing."""
     global defect_model  # Ensure it's global
@@ -152,7 +151,6 @@ def upload_files():
                     defects[defect] = defects.get(defect, 0) + count
 
     return jsonify({ "imagesResults": results, "defects": defects }), 200
-
 
 def process_image(image_path):
     """Processes image and predicts defects."""
@@ -248,7 +246,6 @@ def analyze_defects(edges):
 
     return {label: count for label, count in detected_defects.items() if count > 0}
 
-
 def visualize_defects(image, output_path, defects):
     """Draws detected defects on the image."""
     colors = {
@@ -268,7 +265,6 @@ def visualize_defects(image, output_path, defects):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, colors[defect], 2)
 
     cv2.imwrite(output_path, image)
-
 
 @bp.route('/train', methods=['POST'])
 def manual_train():

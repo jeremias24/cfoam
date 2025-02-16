@@ -1,6 +1,102 @@
 <template>
   <div :class="`${initLoading ? 'overlay overlay-block' : ''}`">
-    <div class="card mb-5 mt-0">
+    <div class="card mb-5 mt-0" >
+        <!--begin::Col-->
+        <div class="col-xl-12 mb-xl-5 px-0 pb-0">
+          <div class="card-body py-0">
+            <div class="row gx-6 gy-3">
+              <div class="col-xl-6">
+                <div class="mt-5">
+                  <div class="card-body py-0 px-0">
+                    <div v-if="isCameraActive">
+                      <!-- <button 
+                        class="btn btn-lg fw-bold btn-primary mb-3"
+                      > 
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16" height="16" 
+                          fill="currentColor" 
+                          class="bi bi-camera" 
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+                          <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+                        </svg>
+                        &nbsp; Capture Image
+                      </button> -->
+
+                      <!-- begin::Camera Stream -->
+                      <video class="col-xl-6" ref="video" style="width: 100%; height: 100%" autoplay></video>
+                      <!-- end::Camera Stream -->
+                    </div>
+
+                    <div v-if="isUploadActive"> 
+                      <!--begin::Primary button-->
+                      <Upload
+                        v-model:formData="initFormData.images"
+                        form-key="images"
+                        container-path="storage/upload/images"
+                        max-filesize="10"
+                        button-label="Attach Images/s"
+                        button-icon="picture"
+                        :filesize-accepted="10"
+                      >
+                      </Upload>
+                      <!--end::Primary button-->
+        
+                      <button @click="submit()" type="submit"
+                        :data-kt-indicator="initLoading ? 'on' : null"
+                        class="btn btn-lg fw-bold btn-primary mb-3"
+                      > 
+                        <span v-if="!initLoading" class="indicator-label">
+                          <KTIcon icon-name="send" icon-class="fs-5 ms-2 me-0" />  Submit
+                        </span>
+
+                        <span v-if="initLoading" class="indicator-progress">
+                          In Progress...
+                          <span
+                            class="spinner-border spinner-border-sm align-middle ms-2"
+                          >
+                          </span>
+                        </span>
+                      </button>
+                    </div>
+
+                    <div v-if="!(isCameraActive || isUploadActive)">
+                      <div class="col-xl-12 text-center">
+                        <img
+                          alt="Picture"
+                          :src="getAssetPath('media/images/city-driver-pana.png')"
+                          style="width: 85%; height: 85%"
+                        />
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-6 mb-5">
+                <div class="mt-5">
+                  <div class="card-body py-5 px-5">
+                    <div class="col-xl-12 text-center">
+                      <img v-if="!isAnalyzed"
+                        alt="Picture"
+                        :src="getAssetPath('media/images/data-extraction-amico.png')"
+                        style="width: 85%; height: 85%"
+                      />
+                      <VueApexCharts v-else type="pie" :options="chartOptions" :series="series" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--end::Col-->
+    </div>
+
+    <div class="card">
       <div class="card-header border-0 py-0">
         <!--begin::Card title-->
         <!--begin::Wrapper-->
@@ -30,74 +126,6 @@
         </div>
         <!--end::Wrapper-->
         <!--end::Card title-->
-      </div>
-    </div>
-
-    <div v-if="isCameraActive || isUploadActive">
-      <div class="card" >
-          <!--begin::Col-->
-          <div class="col-xl-12 mb-xl-5 px-0 pb-0">
-            <div class="card-body py-0">
-              <div class="row gx-6 gy-3">
-                <div class="col-xl-6">
-                  <div class="mt-5">
-                    <div class="card-body py-0 px-0">
-                      <div v-if="isCameraActive">
-                        <!-- begin::Camera Stream -->
-                        <video class="col-xl-6" ref="video" style="width: 100%; height: 100%" autoplay></video>
-                        <!-- end::Camera Stream -->
-                      </div>
-
-                      <div v-if="isUploadActive">
-                        <!--begin::Primary button-->
-                        <Upload
-                          v-model:formData="initFormData.images"
-                          form-key="images"
-                          container-path="storage/upload/images"
-                          max-filesize="10"
-                          button-label="Attach Images/s"
-                          button-icon="picture"
-                          :filesize-accepted="10"
-                        >
-                        </Upload>
-                        <!--end::Primary button-->
-
-                        <!-- v-if="imagesUploadCount > 0" -->
-          
-                        <button @click="submit()" type="submit"
-                          :data-kt-indicator="initLoading ? 'on' : null"
-                          class="btn btn-lg fw-bold btn-primary mb-3"
-                        > 
-                          <span v-if="!initLoading" class="indicator-label">
-                            <KTIcon icon-name="send" icon-class="fs-5 ms-2 me-0" />  Submit
-                          </span>
-
-                          <span v-if="initLoading" class="indicator-progress">
-                            In Progress...
-                            <span
-                              class="spinner-border spinner-border-sm align-middle ms-2"
-                            >
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-xl-6 mb-5">
-                  <div class="mt-5">
-                    <div class="card-body py-5 px-5">
-                      <div class="col-xl-12 text-center">
-                        <VueApexCharts v-if="isAnalyzed" type="pie" :options="chartOptions" :series="series" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!--end::Col-->
       </div>
     </div>
 
@@ -167,8 +195,7 @@ export default defineComponent({
       images: [
         {
           required: true,
-          message: "Attach Image/s field is required.",
-          type: "images"
+          message: "Image/s field is required.",
         },
       ],
     });
@@ -211,7 +238,6 @@ export default defineComponent({
     });
 
     const series = ref<number[]>([]);
-    const imagesUploadCount = ref<number>(0);
 
     const getUser = computed(() => {
       return authStore?.getUser();
@@ -238,14 +264,6 @@ export default defineComponent({
           isAnalyzed.value = false;
         }
       }
-    );
-
-    watch(
-      () => initFormData.value.images,
-      (value) => {
-        imagesUploadCount.value = value.images.length;
-      },
-      { deep: true }
     );
 
     const startCamera = async () => {
@@ -339,8 +357,7 @@ export default defineComponent({
       initLoading,
       chartOptions,
       series,
-      isAnalyzed,
-      imagesUploadCount
+      isAnalyzed
     };
   },
 });
