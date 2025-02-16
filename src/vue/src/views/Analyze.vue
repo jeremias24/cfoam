@@ -58,6 +58,7 @@
                           button-label="Attach Images/s"
                           button-icon="picture"
                           :filesize-accepted="10"
+                          :car-parts="initCarParts"
                         >
                         </Upload>
                         <!--end::Primary button-->
@@ -66,7 +67,7 @@
           
                         <button @click="submit()" type="submit"
                           :data-kt-indicator="initLoading ? 'on' : null"
-                          class="btn btn-lg fw-bold btn-primary mb-3"
+                          class="btn btn-lg fw-bold btn-primary"
                         > 
                           <span v-if="!initLoading" class="indicator-label">
                             <KTIcon icon-name="send" icon-class="fs-5 ms-2 me-0" />  Submit
@@ -133,6 +134,7 @@ import MixinService from "@/assets/template/core/services/MixinService";
 import GroupButtonRadio from "@/assets/template/layouts/default-layout/components/extras/controls/button/GroupButtonRadio.vue";
 import Upload from "@/assets/template/layouts/default-layout/components/extras/controls/upload/Upload.vue";
 import { IAnalysis } from "@/types/analysis";
+import { ICarParts } from "@/types/carParts";
 import VueApexCharts from "vue3-apexcharts";
 
 export default defineComponent({
@@ -146,6 +148,7 @@ export default defineComponent({
   setup() {
     /** Default Setup */
     const authStore = useAuthStore();
+    
     const initLoading = ref<boolean>(false);
     const isAnalyzed = ref<boolean>(false);
     const initCameraGroupButton = ref([]);
@@ -162,6 +165,7 @@ export default defineComponent({
 
     const initFormData = ref<IAnalysis>({ ...initDefaultFormData });
     const initFormRules = ref();
+    const initCarParts = ref<ICarParts>();
 
     const initFormDefaultRules = ref({
       images: [
@@ -221,6 +225,8 @@ export default defineComponent({
       initCameraGroupButton.value = cameras.value.map(
         (value) => ({ ...value, column: 6, name: "camera" })
       );
+
+      getCarParts();
     });
 
     watch(
@@ -284,6 +290,8 @@ export default defineComponent({
         initFormRules.value
       );
 
+      console.log(initFormData.value);
+
       if (initValidationError.value.valid) {
 
         MixinService.showConfirmAlert(
@@ -326,9 +334,22 @@ export default defineComponent({
       }
     };
 
+    const getCarParts = () => {
+      ApiService.get("car-parts")
+      .then(({ data }) => {
+        if (data?.carParts) {
+          initCarParts.value = data.carParts;
+        } 
+      })
+      .catch(({ error }) => {
+        console.log(error);
+      })
+    };
+
     return {
       initFormData,
       initCameraGroupButton,
+      initCarParts,
       getAssetPath,
       getUser,
       video,

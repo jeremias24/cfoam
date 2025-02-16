@@ -1,4 +1,4 @@
-interface ICategory {
+interface ICarParts {
     id: number;
     name: string;
     is_active: boolean;
@@ -6,7 +6,6 @@ interface ICategory {
     created_at: string;
     updated_by: number;
     updated_at: string;
-
 }
 
-export type { ICategory };
+export type { ICarParts };

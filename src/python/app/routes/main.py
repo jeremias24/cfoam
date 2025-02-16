@@ -2,7 +2,8 @@ import os
 import joblib
 import numpy as np
 import cv2
-from flask import Flask, Blueprint, request, jsonify, render_template
+import random
+from flask import Flask, Blueprint, request, jsonify, render_template, current_app
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
@@ -276,6 +277,39 @@ def manual_train():
     global defect_model
     defect_model = train_model()
     return jsonify({"message": "Model trained successfully"}), 200
+
+@bp.route('/predict-car-part', methods=['POST'])
+def predict_car_part():
+    """Receives an image and predicts the car part (e.g., Front, Right Side, Left Side, Rear)."""
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "No file received"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Empty file"}), 400
+
+    if file and allowed_file(file.filename):
+        # Save the uploaded file
+        filename = secure_filename(file.filename)
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'uploads')
+        os.makedirs(upload_folder, exist_ok=True)  # Ensure upload folder exists
+        file_path = os.path.join(upload_folder, filename)
+        file.save(file_path)
+
+        # 🔍 Run the AI Model to Predict Car Part
+        predicted_part = classify_car_part(file_path)
+
+        return jsonify({"predictedPart": predicted_part}), 200
+
+    return jsonify({"error": "Invalid file type"}), 400
+
+# 🔍 Dummy AI Model for Car Part Classification (Replace with actual AI model)
+def classify_car_part(image_path):
+    """Simulates car part classification (Replace with real AI model)."""
+    car_parts = ["Front", "Right Side", "Left Side", "Rear"]
+    return random.choice(car_parts)  # Replace with ML Model Output
+
 
 # Register blueprint and start the Flask app
 app.register_blueprint(bp)

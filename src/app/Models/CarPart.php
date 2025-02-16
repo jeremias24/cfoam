@@ -5,21 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Organization extends Model
+class CarPart extends Model
 {
-    protected $table = 'central.organizations';
+    protected $connection = 'mysql';
+    protected $table = 'cfoam.car_parts';
+
     public $timestamps = false;
-    public $organizations;
+    public $carParts;
 
     public function getWhere($filter) {
-        $this->organizations = 
+        $this->carParts = 
             $this->where($filter)
+            ->orderBy('name')
             ->get();
         
         return $this;
     }
 
+    public function getAll() 
+    {
+        
+    }
+
     public function result() {
-        return collect($this->organizations);
+        return $this->carParts;
     }
 }

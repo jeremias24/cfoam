@@ -5,22 +5,24 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Category;
+use Illuminate\Support\Str;
 
-use App\Resources\CategoriesResource;
+use App\Models\CarPart;
 
-class CategoriesController extends Controller
+use App\Resources\CarPartsResource;
+
+class CarPartsController extends Controller
 {   
-    public function __construct(Category $category) {
-        $this->category = $category;
+    public function __construct(CarPart $carPart) {
+        $this->carPart = $carPart;
     }
 
     public function index()
     {
-        $categories = $this->category->getWhere(['is_active' => 1])->result();
+        $carParts = $this->carPart->getWhere(['is_active' => 1])->result();
 
         return [
-            'categories' => (! is_null($categories)) ? CategoriesResource::collection($categories) : $categories
+            Str::camel('car_parts') => (! is_null($carParts)) ? CarPartsResource::collection($carParts) : $carParts
         ];
     }
 

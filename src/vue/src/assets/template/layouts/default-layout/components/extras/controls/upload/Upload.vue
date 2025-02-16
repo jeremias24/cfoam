@@ -29,6 +29,18 @@
                             />
                             <!--end::Preview existing avatar-->
 
+
+                            <!-- begin::Auto labeled car part -->
+                            <div class="mt-2">
+                                <select v-model="file.autoLabel" class="form-control">
+                                    <option v-for="part in initCarParts" :key="part.id" :value="part.name">
+                                        {{ part.name }}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- end::Auto labeled car part -->
+
+
                             <!--begin::Toolbar-->
                             <div>
                                 <!--begin::Label-->
@@ -58,6 +70,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from "vue";
 import MixinService from "@/assets/template/core/services/MixinService";
+import ApiService from "@/assets/template/core/services/ApiService";
 
 export default defineComponent({
   name: "control-upload",
@@ -72,6 +85,7 @@ export default defineComponent({
     checkDuplicateFile: { type: Boolean, required: true, default: true },
     buttonLabel: { type: String, required: true },
     buttonIcon: { type: String, required: true },
+    carParts: {type: Array, required: true}
   },
   emits: ["update:formData"],
   setup(props, { emit }) {
@@ -81,6 +95,7 @@ export default defineComponent({
 
     const initFiles = ref(props.formData);
     const initFile = ref(null);
+    const initCarParts = ref(props.carParts);
 
     watch(
       () => props.formData,
@@ -141,7 +156,7 @@ export default defineComponent({
 
             // 🔹 Read file and generate preview
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = () =>  {
                 initFiles.value.push({
                     file,
                     filename: file.name,
@@ -152,7 +167,27 @@ export default defineComponent({
                     mimeType: file.type,
                     lastModified: file.lastModified,
                     sourceType: "upload",
+                    autoLabel: "Detecting..." // Default before auto-labeling
                 });
+
+                const formData  = new FormData();
+                formData.append("file", file); // Attach the image
+                const fileIndex = initFiles.value.length - 1;
+                
+                ApiService.aiPost(
+                    "predict-car-part",
+                    formData, {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    })
+                    .then(({ data }) => {
+                        initFiles.value[fileIndex] = {
+                            ...initFiles.value[fileIndex],
+                            autoLabel: data.predictedPart || "Unknown"
+                        };
+                    })
+                    .catch(({ error }) => {
+                        console.log(error);
+                    });
 
                 // 🔹 Update formData after all files are processed
                 emit("update:formData", { [props.formKey]: [...initFiles.value] });
@@ -233,7 +268,8 @@ export default defineComponent({
       initButtonLabel,
       initButtonIcon,
       getFilesize,
-      openViewer
+      openViewer,
+      initCarParts
     };
   },
 });
